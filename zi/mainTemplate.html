@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>artlebedev.ru</title>
+    <meta charset="utf-8" />
+</head>
+<body>
+    <h1>artlebedev.ru</h1>
+    {{ range .items }}
+        {{ .Date }}
+        <h2> <a href="/p/{{ .Link }}"> {{ .Title }} </a> </h2>
+        <br />
+    {{ end }}
+</body>
+</html>
