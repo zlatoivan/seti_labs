@@ -5,7 +5,10 @@
     <meta charset="utf-8" />
 </head>
 <body>
-<h1>{{ .article.Title }}</h1>
-{{ .article.Content }}
+    <h1>{{ .article.Title }}</h1>
+    {{ range .article.Content }}
+        {{ . }}
+        <br /><br />
+    {{ end }}
 </body>
 </html>

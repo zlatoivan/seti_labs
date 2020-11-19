@@ -63,7 +63,7 @@ type item struct {
 
 type article struct {
 	Title string
-	Content string
+	Content []string
 }
 
 func parseMain(document *html.Node) []item {
@@ -94,7 +94,6 @@ func parseMain(document *html.Node) []item {
 			title += ctx.NextSibling.Data // конец названия
 		}
 		//fmt.Println(link)
-		//title = "\b" + title + "\b" // убираем лишние отступы
 		//fmt.Println(title)
 
 		i := item{
@@ -109,6 +108,7 @@ func parseMain(document *html.Node) []item {
 
 func parseBlock(n *html.Node) string {
 	if n.Type == html.TextNode {
+		fmt.Println("OK", n.Data)
 		return n.Data
 	}
 	res := ""
@@ -122,11 +122,15 @@ func parseArticle(document *html.Node) article {
 	// парсинг названия
 	title := getElementsByClassName(document, "als-text-title")[0].FirstChild.FirstChild.Data
 
-	mainBlock := getElementsByClassName(document, "without-cover")[0]
+	blocks := getElementsByClassName(document, "announce__text")
+	var parag []string
+	for _, b := range blocks {
+		parag = append(parag, parseBlock(b))
+	}
 
 	return article{
 		Title: title,
-		Content: parseBlock(mainBlock),
+		Content: parag,
 	}
 }
 
@@ -138,6 +142,7 @@ func main() {
 	t, _ = ioutil.ReadFile("zi/articleTemplate.html")
 	articleTemplate = string(t)
 
+	// чтоб убрать лишний ответ, так как /favicon.ico отвечает и на просто /
 	http.HandleFunc("/favicon.ico", func(rw http.ResponseWriter, r *http.Request) {
 		fav, _ := ioutil.ReadFile("zi/favicon.ico")
 		rw.Write(fav)
@@ -145,9 +150,9 @@ func main() {
 
 	http.HandleFunc("/p/", func(rw http.ResponseWriter, r *http.Request) {
 		// r.URL.Path - все после домена (начиная с первого слеша)
-		url := r.URL.Path[2:] // - начиная с 3 символа (удаляем /p/)
-		fmt.Println("move to", url)
-		p, _ := http.Get(domain + url)
+		url := r.URL.Path[2:] // - начиная со 2 символа (удаляем /p)
+		fmt.Println(url)
+		p, _ := http.Get(domain + url) // https://www.artlebedev.ru + /byblos/parsloe-leedham/
 		document, _ := html.Parse(p.Body)
 		article := parseArticle(document)
 		t, _ := template.New("").Parse(articleTemplate)
@@ -163,9 +168,12 @@ func main() {
 	})
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
+		fmt.Println("Start")
 		p, _ := http.Get(mainUrl)
 		document, _ := html.Parse(p.Body)
+		fmt.Println("****************************************************************")
 		items := parseMain(document)
+		fmt.Println(len(items))
 		t, _ := template.New("").Parse(mainTemplate)
 		rw.WriteHeader(200)
 		b := bytes.NewBufferString("")
@@ -179,6 +187,7 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
+		fmt.Println("----------------------------------------------------------------")
 		fmt.Println("Finish\n\n")
 	})
 
