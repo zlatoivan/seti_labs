@@ -108,7 +108,6 @@ func parseMain(document *html.Node) []item {
 
 func parseBlock(n *html.Node) string {
 	if n.Type == html.TextNode {
-		fmt.Println("OK", n.Data)
 		return n.Data
 	}
 	res := ""
@@ -151,7 +150,7 @@ func main() {
 	http.HandleFunc("/p/", func(rw http.ResponseWriter, r *http.Request) {
 		// r.URL.Path - все после домена (начиная с первого слеша)
 		url := r.URL.Path[2:] // - начиная со 2 символа (удаляем /p)
-		fmt.Println(url)
+		fmt.Println("-> ", url)
 		p, _ := http.Get(domain + url) // https://www.artlebedev.ru + /byblos/parsloe-leedham/
 		document, _ := html.Parse(p.Body)
 		article := parseArticle(document)
@@ -168,10 +167,8 @@ func main() {
 	})
 
 	http.HandleFunc("/", func(rw http.ResponseWriter, r *http.Request) {
-		fmt.Println("Start")
 		p, _ := http.Get(mainUrl)
 		document, _ := html.Parse(p.Body)
-		fmt.Println("****************************************************************")
 		items := parseMain(document)
 		fmt.Println(len(items))
 		t, _ := template.New("").Parse(mainTemplate)
@@ -187,8 +184,6 @@ func main() {
 		if err != nil {
 			log.Println(err.Error())
 		}
-		fmt.Println("----------------------------------------------------------------")
-		fmt.Println("Finish\n\n")
 	})
 
 
