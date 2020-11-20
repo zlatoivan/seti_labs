@@ -170,7 +170,6 @@ func main() {
 		p, _ := http.Get(mainUrl)
 		document, _ := html.Parse(p.Body)
 		items := parseMain(document)
-		fmt.Println(len(items))
 		t, _ := template.New("").Parse(mainTemplate)
 		rw.WriteHeader(200)
 		b := bytes.NewBufferString("")
@@ -185,7 +184,6 @@ func main() {
 			log.Println(err.Error())
 		}
 	})
-
 
 	fmt.Println("Server is listening...")
 	http.ListenAndServe(":7777", nil)

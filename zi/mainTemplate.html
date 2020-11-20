@@ -3,12 +3,20 @@
 <head>
     <title>artlebedev.ru</title>
     <meta charset="utf-8" />
+    <style type="text/css">
+        .space {
+            font: 1rem 'Fira Sans', sans-serif;
+            margin: 30px;
+        }
+    </style>
 </head>
 <body>
     <h1>artlebedev.ru</h1>
     {{ range .items }}
         {{ .Date }}
-        <h2> <a href="/p/{{ .Link }}"> {{ .Title }} </a> </h2>
+        <a class="space" href="/p/{{ .Link }}">
+            {{ .Title }} <br>
+        </a>
         <br />
     {{ end }}
 </body>
